@@ -58,6 +58,23 @@ def add_to_diary_blog():
         return jsonify({'message': 'Comment added successfully'})
     else:
         return jsonify({'error': f'TypeIt Space "{space_name}" not found'}), 404
+        
+
+@app.route('/get_comments/<space_name>', methods=['GET'])
+def get_comments(space_name):
+    # Retrieve comments for a specific TypeIt space from the MongoDB collection
+    typeit_space = typeit_space_collection.find_one({'space_name': space_name})
+
+    if typeit_space:
+        comments = typeit_space['comments']
+        # Assuming each comment has a 'date', 'text', and 'sentiment' field
+        formatted_comments = [
+            {'date': comment['date'], 'text': comment['text'], 'sentiment': comment['sentiment']}
+            for comment in comments
+        ]
+        return jsonify({'comments': formatted_comments})
+    else:
+        return jsonify({'error': f'TypeIt Space "{space_name}" not found'}), 404
 
 
 if __name__ == '__main__':
